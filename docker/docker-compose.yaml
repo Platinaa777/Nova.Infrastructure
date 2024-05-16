@@ -31,3 +31,31 @@ services:
       - backend
     depends_on:
       - prometheus
+  
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:1.6
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 9411:9411
+    networks:
+      - backend
+
+      # --name loki -v <local-path>:/mnt/config -p 3100:3100 grafana/loki:3.0.0 --config.file=/mnt/config/loki-config.yaml
+  loki:
+    container_name: loki
+    image: grafana/loki:3.0.0
+    ports:
+      - 3100:3100
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    command: --config.file=/etc/loki/local-config.yaml
+    networks:
+      - backend
